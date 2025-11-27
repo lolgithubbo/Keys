@@ -7,7 +7,15 @@ export default function Home() {
 
   useEffect(() => {
     async function loadCode() {
-      const res = await fetch("/api/code");
+      // Fügt Timestamp hinzu, um Cache zu verhindern
+      const timestamp = new Date().getTime();
+      const res = await fetch(`/api/code?t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
       const data = await res.json();
       setCode(data.code);
     }
@@ -29,4 +37,4 @@ export default function Home() {
       </div>
     </div>
   );
-    }
+}
