@@ -1,81 +1,131 @@
-/* === Variante C: Ultra-Realistic CSS Snowfall (Deep 3D) === */
+/* app/globals.css
+   Ultra-Realistic CSS-only snowfall using pseudo-elements.
+   Paste/replace this file in your Next.js project's app/globals.css
+*/
 
-body {
-  perspective: 800px;
+/* base resets you probably already have - keep if you want */
+:root {
+  --snow-opacity-back: 0.28;
+  --snow-opacity-mid: 0.56;
+  --snow-opacity-front: 0.85;
+  --perspective: 900px;
+}
+
+/* keep your existing base styles (colors, fonts) here if needed */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000; /* fallback - remove/adjust to your design */
+}
+
+/* --- Make the document 3D-capable --- */
+html {
+  perspective: var(--perspective);
   transform-style: preserve-3d;
 }
 
-/* --- Schicht 1: ganz hinten, sehr viele kleine Flocken --- */
+/* --- DEEP BACK LAYER: many tiny slow flakes --- */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9996;
   pointer-events: none;
-  opacity: 0.35;
+  z-index: 9995;
 
+  /* three layered dot patterns (different sizes -> illusion of depth) */
   background-image:
-    radial-gradient(white 1px, transparent 1px),
-    radial-gradient(white 1px, transparent 1px),
-    radial-gradient(white 1px, transparent 1px);
-  background-size:
-    2px 2px,
-    3px 3px,
-    1px 1px;
-  animation: snow-deep 30s linear infinite, drift1 5s ease-in-out infinite alternate;
-  transform: translateZ(-250px) scale(0.7);
+    radial-gradient(white 0.9px, transparent 0.9px),
+    radial-gradient(white 1.3px, transparent 1.3px),
+    radial-gradient(white 0.7px, transparent 0.7px);
+
+  background-size: 2.5px 2.5px, 3.6px 3.6px, 1.8px 1.8px;
+  background-repeat: repeat;
+  opacity: var(--snow-opacity-back);
+
+  /* very slow, long travel */
+  animation: snow-deep 34s linear infinite, sway-deep 6s ease-in-out infinite alternate;
+  transform: translateZ(-280px) scale(0.72);
+  will-change: background-position, transform;
+  filter: blur(0.2px);
 }
 
-/* --- Schicht 2: Mitte, normal große Flocken --- */
+/* --- MIDDLE LAYER: normal flakes --- */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9997;
   pointer-events: none;
-  opacity: 0.55;
+  z-index: 9996;
 
   background-image:
-    radial-gradient(white 2px, transparent 2px),
-    radial-gradient(white 3px, transparent 3px);
-  background-size:
-    4px 4px,
-    5px 5px;
-  animation: snow-mid 18s linear infinite, drift2 4s ease-in-out infinite alternate;
+    radial-gradient(white 1.6px, transparent 1.6px),
+    radial-gradient(white 2.6px, transparent 2.6px),
+    radial-gradient(white 1.2px, transparent 1.2px);
+
+  background-size: 5px 5px, 7px 7px, 3.6px 3.6px;
+  background-repeat: repeat;
+  opacity: var(--snow-opacity-mid);
+
+  animation: snow-mid 20s linear infinite, sway-mid 4.8s ease-in-out infinite alternate;
   transform: translateZ(0px) scale(1);
+  will-change: background-position, transform;
+  filter: blur(0.3px);
 }
 
-/* --- Extra: Vordergrund große, seltene Flocken --- */
-body::after {
-  box-shadow:
-    /* ungefähr 1000 Schneeflocken simuliert */
-    10vw 10vh white,
-    30vw -20vh white,
-    70vw 5vh white,
-    -10vw 40vh white,
-    50vw 80vh white;
-  filter: blur(1px);
+/* --- FRONT LAYER (optional extra): rare, large flakes (simulate with repeating box-shadow) --- */
+/* We use an extra pseudo-layer via a pinned element fallback:
+   if your project already has a root element like #__next or main, you could attach extra rules
+   but since you asked for a single global.css, we simulate sparse large flakes via ::selection hack
+   (not visible). Instead we add a helper class below you can toggle if desired. */
+.snow-front {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  transform: translateZ(140px) scale(1.25);
+  opacity: var(--snow-opacity-front);
+  will-change: transform, opacity;
 }
 
-/* --- Keyframes Fallen --- */
+/* keyframes: vertical travel (background-position) */
 @keyframes snow-deep {
-  0%   { background-position: 0 -150vh; }
-  100% { background-position: 0 150vh; }
+  0%   { background-position: 0 -160vh, 20vw -80vh, 50vw -140vh; }
+  100% { background-position: 0 160vh, 20vw 80vh, 50vw 140vh; }
 }
 
 @keyframes snow-mid {
-  0%   { background-position: 0 -120vh; }
-  100% { background-position: 0 120vh; }
+  0%   { background-position: 10vw -120vh, 60vw -90vh, 30vw -130vh; }
+  100% { background-position: 10vw 120vh, 60vw 90vh, 30vw 130vh; }
 }
 
-/* --- leichte horizontale Drift --- */
-@keyframes drift1 {
-  0%   { transform: translateZ(-250px) translateX(-10px); }
-  100% { transform: translateZ(-250px) translateX(10px); }
+/* gentle horizontal sway to simulate wind */
+@keyframes sway-deep {
+  0%   { transform: translateZ(-280px) translateX(-14px) scale(0.72) rotateX(0deg); }
+  100% { transform: translateZ(-280px) translateX(14px)  scale(0.72) rotateX(4deg); }
 }
 
-@keyframes drift2 {
-  0%   { transform: translateZ(0px) translateX(-15px); }
-  100% { transform: translateZ(0px) translateX(
-    15px); }
+@keyframes sway-mid {
+  0%   { transform: translateZ(0px) translateX(-22px) scale(1) rotateX(0deg); }
+  100% { transform: translateZ(0px) translateX(22px)  scale(1) rotateX(8deg); }
+}
+
+/* tiny performance hint for mobile: reduce animation complexity on low-power devices */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+    opacity: 0.25;
+  }
+}
+
+/* optional helper: toggle denser snow by adding a class to body (e.g. body.snow-heavy) */
+body.snow-heavy::before {
+  opacity: 0.42;
+}
+body.snow-heavy::after {
+  opacity: 0.9;
+  animation-duration: 16s;
 }
