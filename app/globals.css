@@ -1,131 +1,105 @@
-/* app/globals.css
-   Ultra-Realistic CSS-only snowfall using pseudo-elements.
-   Paste/replace this file in your Next.js project's app/globals.css
-*/
-
-/* base resets you probably already have - keep if you want */
-:root {
-  --snow-opacity-back: 0.28;
-  --snow-opacity-mid: 0.56;
-  --snow-opacity-front: 0.85;
-  --perspective: 900px;
-}
-
-/* keep your existing base styles (colors, fonts) here if needed */
-html, body {
-  height: 100%;
+/* --------------------------
+   GLOBAL BACKGROUND + FONT
+--------------------------- */
+body, html {
   margin: 0;
   padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: #000; /* fallback - remove/adjust to your design */
+  background: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
-/* --- Make the document 3D-capable --- */
-html {
-  perspective: var(--perspective);
+/* --------------------------
+   CENTER CONTAINER
+--------------------------- */
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+/* --------------------------
+   LILA CODE BOX (ORIGINAL)
+--------------------------- */
+.code-box {
+  background: #6a00ff;
+  padding: 25px 40px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 0 20px #6a00ff;
+  z-index: 20;
+}
+
+.code-box h1 {
+  font-size: 48px;
+  margin: 0;
+  color: white;
+}
+
+.code-box button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.code-box button:hover {
+  background: #333;
+}
+
+/* -------------------------------------------------------
+   REALISTIC 3D SNOWFALL (NEU, KEIN HTML ÄNDERN NOTWENDIG)
+-------------------------------------------------------- */
+
+.snow {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  perspective: 1200px;
+}
+
+/* Jede Schneeflocke wird dynamisch gerendert */
+.snowflake {
+  position: absolute;
+  top: -10px;
+  color: white;
+  font-size: var(--size);
+  opacity: var(--opacity);
+  filter: blur(var(--blur));
   transform-style: preserve-3d;
+
+  animation:
+    fall3d linear infinite var(--delay),
+    drift ease-in-out infinite var(--drift);
 }
 
-/* --- DEEP BACK LAYER: many tiny slow flakes --- */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9995;
-
-  /* three layered dot patterns (different sizes -> illusion of depth) */
-  background-image:
-    radial-gradient(white 0.9px, transparent 0.9px),
-    radial-gradient(white 1.3px, transparent 1.3px),
-    radial-gradient(white 0.7px, transparent 0.7px);
-
-  background-size: 2.5px 2.5px, 3.6px 3.6px, 1.8px 1.8px;
-  background-repeat: repeat;
-  opacity: var(--snow-opacity-back);
-
-  /* very slow, long travel */
-  animation: snow-deep 34s linear infinite, sway-deep 6s ease-in-out infinite alternate;
-  transform: translateZ(-280px) scale(0.72);
-  will-change: background-position, transform;
-  filter: blur(0.2px);
-}
-
-/* --- MIDDLE LAYER: normal flakes --- */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9996;
-
-  background-image:
-    radial-gradient(white 1.6px, transparent 1.6px),
-    radial-gradient(white 2.6px, transparent 2.6px),
-    radial-gradient(white 1.2px, transparent 1.2px);
-
-  background-size: 5px 5px, 7px 7px, 3.6px 3.6px;
-  background-repeat: repeat;
-  opacity: var(--snow-opacity-mid);
-
-  animation: snow-mid 20s linear infinite, sway-mid 4.8s ease-in-out infinite alternate;
-  transform: translateZ(0px) scale(1);
-  will-change: background-position, transform;
-  filter: blur(0.3px);
-}
-
-/* --- FRONT LAYER (optional extra): rare, large flakes (simulate with repeating box-shadow) --- */
-/* We use an extra pseudo-layer via a pinned element fallback:
-   if your project already has a root element like #__next or main, you could attach extra rules
-   but since you asked for a single global.css, we simulate sparse large flakes via ::selection hack
-   (not visible). Instead we add a helper class below you can toggle if desired. */
-.snow-front {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  transform: translateZ(140px) scale(1.25);
-  opacity: var(--snow-opacity-front);
-  will-change: transform, opacity;
-}
-
-/* keyframes: vertical travel (background-position) */
-@keyframes snow-deep {
-  0%   { background-position: 0 -160vh, 20vw -80vh, 50vw -140vh; }
-  100% { background-position: 0 160vh, 20vw 80vh, 50vw 140vh; }
-}
-
-@keyframes snow-mid {
-  0%   { background-position: 10vw -120vh, 60vw -90vh, 30vw -130vh; }
-  100% { background-position: 10vw 120vh, 60vw 90vh, 30vw 130vh; }
-}
-
-/* gentle horizontal sway to simulate wind */
-@keyframes sway-deep {
-  0%   { transform: translateZ(-280px) translateX(-14px) scale(0.72) rotateX(0deg); }
-  100% { transform: translateZ(-280px) translateX(14px)  scale(0.72) rotateX(4deg); }
-}
-
-@keyframes sway-mid {
-  0%   { transform: translateZ(0px) translateX(-22px) scale(1) rotateX(0deg); }
-  100% { transform: translateZ(0px) translateX(22px)  scale(1) rotateX(8deg); }
-}
-
-/* tiny performance hint for mobile: reduce animation complexity on low-power devices */
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    animation: none;
-    opacity: 0.25;
+/* Vertikaler 3D-Fall */
+@keyframes fall3d {
+  0% {
+    transform: translate3d(var(--x), -10vh, var(--z))
+               rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: translate3d(var(--x), 120vh, var(--z))
+               rotateX(360deg) rotateY(360deg);
   }
 }
 
-/* optional helper: toggle denser snow by adding a class to body (e.g. body.snow-heavy) */
-body.snow-heavy::before {
-  opacity: 0.42;
-}
-body.snow-heavy::after {
-  opacity: 0.9;
-  animation-duration: 16s;
+/* Leichtes Hin-und-Her-Schweben */
+@keyframes drift {
+  0%   { margin-left: 0; }
+  50%  { margin-left: 15px; }
+  100% { margin-l
+     eft: 0; }
 }
