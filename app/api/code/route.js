@@ -1,12 +1,10 @@
-import { randomUUID } from 'crypto';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
   // Generiert einen einzigartigen Key im Format Offi-XXXXXX
-  // Verwendet UUID für 100% Einzigartigkeit
-  const uuid = randomUUID().replace(/-/g, '').substring(0, 6).toUpperCase();
+  // Verwendet crypto.randomUUID() (Web Crypto API - funktioniert in Vercel)
+  const uuid = crypto.randomUUID().replace(/-/g, '').substring(0, 6).toUpperCase();
   const code = 'Offi-' + uuid;
   
   return new Response(JSON.stringify({ code }), {
