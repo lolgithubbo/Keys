@@ -1,69 +1,81 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  background: black;
-  color: white;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
+/* === Variante C: Ultra-Realistic CSS Snowfall (Deep 3D) === */
+
+body {
+  perspective: 800px;
+  transform-style: preserve-3d;
 }
 
-.container {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-/* Lila Box */
-.code-box {
-  background: #6a00ff;
-  padding: 25px 40px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 0 20px #6a00ff;
-}
-
-.code-box h1 {
-  font-size: 48px;
-  margin: 0;
-  color: white;
-}
-
-.code-box button {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.code-box button:hover {
-  background: #333;
-}
-
-/* Schneeflocken Animation - Weiße Schneeflocken auf schwarzem Hintergrund */
-.snow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+/* --- Schicht 1: ganz hinten, sehr viele kleine Flocken --- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
   pointer-events: none;
+  opacity: 0.35;
+
   background-image:
     radial-gradient(white 1px, transparent 1px),
-    radial-gradient(white 2px, transparent 2px),
+    radial-gradient(white 1px, transparent 1px),
     radial-gradient(white 1px, transparent 1px);
-  background-size: 3px 3px, 2px 2px, 1px 1px;
-  animation: snowfall 10s linear infinite;
-  opacity: 0.4;
+  background-size:
+    2px 2px,
+    3px 3px,
+    1px 1px;
+  animation: snow-deep 30s linear infinite, drift1 5s ease-in-out infinite alternate;
+  transform: translateZ(-250px) scale(0.7);
 }
 
-@keyframes snowfall {
-  0% { background-position: 0 -100%; }
-  100% { background-position: 0 100%; }
+/* --- Schicht 2: Mitte, normal große Flocken --- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  opacity: 0.55;
+
+  background-image:
+    radial-gradient(white 2px, transparent 2px),
+    radial-gradient(white 3px, transparent 3px);
+  background-size:
+    4px 4px,
+    5px 5px;
+  animation: snow-mid 18s linear infinite, drift2 4s ease-in-out infinite alternate;
+  transform: translateZ(0px) scale(1);
+}
+
+/* --- Extra: Vordergrund große, seltene Flocken --- */
+body::after {
+  box-shadow:
+    /* ungefähr 1000 Schneeflocken simuliert */
+    10vw 10vh white,
+    30vw -20vh white,
+    70vw 5vh white,
+    -10vw 40vh white,
+    50vw 80vh white;
+  filter: blur(1px);
+}
+
+/* --- Keyframes Fallen --- */
+@keyframes snow-deep {
+  0%   { background-position: 0 -150vh; }
+  100% { background-position: 0 150vh; }
+}
+
+@keyframes snow-mid {
+  0%   { background-position: 0 -120vh; }
+  100% { background-position: 0 120vh; }
+}
+
+/* --- leichte horizontale Drift --- */
+@keyframes drift1 {
+  0%   { transform: translateZ(-250px) translateX(-10px); }
+  100% { transform: translateZ(-250px) translateX(10px); }
+}
+
+@keyframes drift2 {
+  0%   { transform: translateZ(0px) translateX(-15px); }
+  100% { transform: translateZ(0px) translateX(
+    15px); }
 }
